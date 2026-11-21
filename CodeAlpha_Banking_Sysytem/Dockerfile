@@ -3,11 +3,8 @@ FROM gcc:14
 
 WORKDIR /app
 
-COPY banking_system.cpp .
-COPY accounts.txt .
-COPY customers.txt .
+COPY server.cpp .
 
-RUN g++ -std=c++17 -O2 banking_system.cpp -o banking_system
+RUN g++ -std=c++17 -O2 server.cpp -o server
 
-CMD ["./banking_system"]
-# Trigger CI/CD
+CMD ["./server"]
