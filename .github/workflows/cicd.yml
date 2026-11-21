@@ -17,7 +17,7 @@ jobs:
         working-directory: CodeAlpha_Banking_Sysytem
 
     steps:
-      # Step 1: Checkout repository
+      # Step 1: Checkout code
       - name: Checkout code
         uses: actions/checkout@v4
 
@@ -31,7 +31,15 @@ jobs:
         run: |
           docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/banking-system:latest .
 
-      # Step 4: Login to Docker Hub
+      # Step 4: Check Docker Hub connection
+      - name: Check Docker Hub connection
+        run: |
+          echo "Checking Docker Registry..."
+          curl -sS -D - -o /dev/null https://registry-1.docker.io/v2/ | grep -Ei '^(HTTP/|www-authenticate:)'
+          echo "Checking Docker Auth Service..."
+          curl -sS -o /dev/null -w 'HTTP Status: %{http_code}\n' "https://auth.docker.io/token?service=registry.docker.io"
+
+      # Step 5: Login to Docker Hub
       - name: Login to Docker Hub
         if: github.event_name == 'push'
         env:
@@ -40,7 +48,7 @@ jobs:
         run: |
           printf '%s' "$DOCKERHUB_TOKEN" | docker login -u "$DOCKERHUB_USERNAME" --password-stdin
 
-      # Step 5: Push Docker Image
+      # Step 6: Push Docker Image
       - name: Push Docker Image
         if: github.event_name == 'push'
         run: |
