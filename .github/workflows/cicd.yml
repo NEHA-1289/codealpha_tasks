@@ -11,6 +11,7 @@ on:
 
 jobs:
   build-and-push:
+    name: Build and Push Docker Image
     runs-on: ubuntu-latest
 
     steps:
@@ -44,3 +45,18 @@ jobs:
         if: github.event_name == 'push'
         run: |
           docker push "$IMAGE_NAME"
+
+  deploy:
+    name: Deploy Banking System
+    needs: build-and-push
+    if: github.event_name == 'push'
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Pull Docker Image
+        run: |
+          docker pull "${{ secrets.DOCKERHUB_USERNAME }}/banking-system:latest"
+
+      - name: Run Banking System Container
+        run: |
+          printf '9\n' | docker run --rm -i "${{ secrets.DOCKERHUB_USERNAME }}/banking-system:latest"
